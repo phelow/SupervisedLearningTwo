@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="MarioAI/src"/>
-	<classpathentry kind="src" path="wekaSrc"/>
 	<classpathentry kind="lib" path="MarioAI/lib/asm-all-3.3.jar"/>
 	<classpathentry kind="lib" path="MarioAI/lib/jdom.jar"/>
 	<classpathentry kind="lib" path="MarioAI/lib/junit-4.8.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Program Files (x86)/Weka-3-6/weka.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Weka-3-8/weka.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

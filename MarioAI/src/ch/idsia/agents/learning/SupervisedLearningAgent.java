@@ -58,6 +58,7 @@ import weka.classifiers.*;
 import weka.filters.unsupervised.instance.*;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.core.DenseInstance;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.instance.StratifiedRemoveFolds;
@@ -250,7 +251,9 @@ public void integrateObservation(Environment environment) {
 	  System.out.println("");
 	  for(int i = 0; i <currentState.fields.size(); i++){
 		  System.out.print(currentState.fields.get(i).getInt());
-		  iExample.setValue((Attribute)fvWekaAttributes.elementAt(i), currentState.fields.get(i).getInt());
+		  System.out.println(fvWekaAttributes.get(i).toString());
+		  System.out.println(currentState.fields.get(i).getInt());
+		  iExample.setValue(i, (double)currentState.fields.get(i).getInt());
 		  //System.out.println(iExample.toString());
 		  
 	  }
