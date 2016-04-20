@@ -91,13 +91,168 @@ Instances isTrainingSet = null;
 Instance iExample;
 FastVector fvWekaAttributes;
 String[] tokens;
+
+public enum classifierType{
+	multilayerPerceptron,
+	naiveBayesSimple,
+	KNN,
+	decisionTreeJ48,
+	decisionRandomForest,
+	SMO_RBF,
+	SMO_Polynomial
+}
+
+
+public boolean use10foldcross = true;
+public classifierType m_ct = classifierType.SMO_Polynomial;
+
+public static void TrainTestSplit(Instances data, Classifier scheme, String name) throws Exception{
+	StratifiedRemoveFolds filter = new StratifiedRemoveFolds();
+	String[] options = new String[6];
+	options[0] = "-N";                  // Indicate we want to set the number of folds
+	options[1] = Integer.toString(5);   // Split the data into 5 random folds
+	options[2] = "-F";                  // Indicate we want to select a specific fold
+	options[3] = Integer.toString(1);   // Select the first fold
+	options[4] = "-S";                  // Indicate we want to set the random seed
+	options[5] = Integer.toString(1);   // Set the random seed to 1
+
+	filter.setOptions(options);
+	filter.setInputFormat(data);
+	filter.setInvertSelection(false);
+	Instances test = Filter.useFilter(data, filter);
+	filter.setInvertSelection(true);
+	Instances train = Filter.useFilter(data, filter);
+	
+	Evaluation eval = new Evaluation(train);
+	eval.evaluateModel(scheme,test);
+	System.out.println(eval.toSummaryString("\n" + name + " (Train/Test) Results\n======\n",true));
+	System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+}
+
 public SupervisedLearningAgent(Instances trainingSet) throws Exception
 {
     super("SupervisedLearningAgent");
    isTrainingSet = trainingSet; 
-    
-    m_classifier = (Classifier) new NaiveBayes();
-    isTrainingSet.setClassIndex(12);
+   m_classifier = null;
+   isTrainingSet.setClassIndex(12);
+   switch(m_ct){
+   case multilayerPerceptron:
+	    m_classifier = (Classifier) new MultilayerPerceptron();
+	    ((MultilayerPerceptron)m_classifier).setHiddenLayers("10");
+	    ((MultilayerPerceptron)m_classifier).setTrainingTime(100);
+	    ((MultilayerPerceptron)m_classifier).buildClassifier(trainingSet);
+		if (use10foldcross) {
+			Evaluation eval = new Evaluation(trainingSet);
+			eval.crossValidateModel(((MultilayerPerceptron)m_classifier),trainingSet,10,new Random(1));
+			System.out.println(eval.toSummaryString("\nMLP (10 Fold Cross) Results\n======\n",true));
+			System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+		}
+		else {
+			TrainTestSplit(trainingSet, ((MultilayerPerceptron)m_classifier), "MLP");
+		}
+	   break;
+   case naiveBayesSimple:
+	    m_classifier = (Classifier)new NaiveBayes();
+	    m_classifier.buildClassifier(trainingSet);
+		if (use10foldcross) {
+			Evaluation eval = new Evaluation(trainingSet);
+			eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+			System.out.println(eval.toSummaryString("\nNaive Bayes Results\n======\n",true));
+			System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+		}
+		else {
+			TrainTestSplit(trainingSet, m_classifier, "Naive Bayes");
+		}
+	   
+	    m_classifier = (Classifier) new NaiveBayes();
+	   break;
+   case KNN:
+	   	m_classifier = new IBk();
+	   	((IBk )m_classifier).setKNN(1);
+	   	((IBk )m_classifier).buildClassifier(trainingSet);
+		if (use10foldcross) {
+			Evaluation eval = new Evaluation(trainingSet);
+			eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+			System.out.println(eval.toSummaryString("\nKNN Results\n======\n",true));
+			System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+		}
+		else {
+			TrainTestSplit(trainingSet,m_classifier,"KNN");
+		}
+	   
+	   break;
+   case decisionTreeJ48:
+	   m_classifier = new J48();
+	   ((J48)m_classifier).setConfidenceFactor((float) 0.01);
+	   ((J48)m_classifier).buildClassifier(trainingSet);
+	   if (use10foldcross) {
+		   Evaluation eval = new Evaluation(trainingSet);
+		   eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+		   System.out.println(eval.toSummaryString("\nJ48 Results\n======\n",true));
+		   System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+	   }
+		else
+		{
+			TrainTestSplit(trainingSet,m_classifier,"J48");
+		}
+	   break;
+   case decisionRandomForest:
+	   m_classifier = new RandomForest();
+	   m_classifier.buildClassifier(trainingSet);
+		if (use10foldcross) {
+			Evaluation eval = new Evaluation(trainingSet);
+			eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+			System.out.println(eval.toSummaryString("\nRandom Forest Results\n======\n",true));
+			System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+		}
+		else {
+			TrainTestSplit(trainingSet,m_classifier,"Random Forest");
+		}
+	   break;
+   case SMO_RBF	:
+	   		// Set C in the range from 0.01 to 100.0
+			// RBF for gaussian
+			// Set gamma from 1 to 10
+	   		m_classifier = new SMO();
+			RBFKernel rbf = new RBFKernel();
+			rbf.setGamma(1);
+			((SMO)(m_classifier)).setKernel(rbf);
+			((SMO)(m_classifier)).setC(0.01);
+			m_classifier.buildClassifier(trainingSet);
+			if (use10foldcross) {
+				Evaluation eval = new Evaluation(trainingSet);
+				eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+				System.out.println(eval.toSummaryString("\nSMO (RBF) Results\n======\n",true));
+				System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+			}
+			else {
+				TrainTestSplit(trainingSet,m_classifier,"SMO (RBF)");
+			}
+	   break;
+   case SMO_Polynomial	:
+	// Set C in the range from 0.01 to 100.0
+			// Polynomial
+			// Set exponent to 1 for linear, 2 for quadratic, and 3 for cubic kernel
+			//     (No kernel for dot product)
+			PolyKernel pk = new PolyKernel();
+			pk.setExponent(1);
+			m_classifier = new SMO();
+			((SMO)(m_classifier)).setKernel(pk);
+			((SMO)(m_classifier)).setC(0.01);
+			m_classifier.buildClassifier(trainingSet);
+			if (use10foldcross) {
+				Evaluation eval = new Evaluation(trainingSet);
+				eval.crossValidateModel(m_classifier, trainingSet, 10, new Random(1));
+				System.out.println(eval.toSummaryString("\nSMO (Polynomial) Results\n======\n",true));
+				System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+			}
+			else {
+				TrainTestSplit(trainingSet,m_classifier,"SMO (Polynomial)");
+			}
+	   break;
+   
+   }
+   
     m_classifier.buildClassifier(isTrainingSet);
     
     System.out.println(isTrainingSet.toSummaryString());
