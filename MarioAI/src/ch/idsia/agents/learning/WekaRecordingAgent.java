@@ -104,7 +104,7 @@ private boolean DangerOfAny()
 public boolean[] getAction()
 {
 	//Pass the information into the learning algorithm to find the right output
-	System.out.println("WekaRecordingAgent.getAction()");
+	//System.out.println("WekaRecordingAgent.getAction()");
     return action;
 }
 }

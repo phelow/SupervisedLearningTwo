@@ -118,7 +118,7 @@ private MarioVisualComponent(MarioAIOptions marioAIOptions, MarioEnvironment mar
         this.addKeyListener(cheatAgent);
     }
 
-//        System.out.println("this (from constructor) = " + this);
+//        //System.out.println("this (from constructor) = " + this);
 
     GlobalOptions.registerMarioVisualComponent(this);
 
@@ -321,7 +321,7 @@ public void integrateObservation(Environment environment,int zLevelScene, int zL
 	    	 writer = new BufferedWriter(new FileWriter(newFile,true));
 	    
 	    	 for(int i = 0; i <currentState.fields.size(); i++){
-	    		System.out.println(i + ":" + currentState.fields.size() );
+	    		//System.out.println(i + ":" + currentState.fields.size() );
 	    		writer.write(""+currentState.fields.get(i).getInt()); 
 	    			writer.write(",");
 	    	}
@@ -369,7 +369,7 @@ public void integrateObservation(Environment environment,int zLevelScene, int zL
     //TODO: Write all of inputs to an arf file
 		
 		
-	System.out.println("Recording");
+	//System.out.println("Recording");
 }
 
 public String GenerateAllLabels(int i, String s){
@@ -449,7 +449,7 @@ public void tick()
     // Delay depending on how far we are behind.
     if (delay > 0)
     {
-//            System.out.println("delay = " + delay);
+//            //System.out.println("delay = " + delay);
         try
         {
             tm += delay;
@@ -605,7 +605,7 @@ public void init()
     currentState = new MarioState();
 	outputs = new double[6];
     graphicsConfiguration = getGraphicsConfiguration();
-//        System.out.println("!!HRUYA: graphicsConfiguration = " + graphicsConfiguration);
+//        //System.out.println("!!HRUYA: graphicsConfiguration = " + graphicsConfiguration);
     Art.init(graphicsConfiguration);
 
 
@@ -613,25 +613,25 @@ public void init()
 
 public void postInitGraphics()
 {
-//        System.out.println("this = " + this);
+//        //System.out.println("this = " + this);
     this.thisVolatileImage = this.createVolatileImage(GlobalOptions.VISUAL_COMPONENT_WIDTH, GlobalOptions.VISUAL_COMPONENT_HEIGHT);
     this.thisGraphics = getGraphics();
     this.thisVolatileImageGraphics = this.thisVolatileImage.getGraphics();
-//        System.out.println("thisGraphics = " + thisGraphics);
-//        System.out.println("thisVolatileImageGraphics = " + thisVolatileImageGraphics);
+//        //System.out.println("thisGraphics = " + thisGraphics);
+//        //System.out.println("thisVolatileImageGraphics = " + thisVolatileImageGraphics);
 }
 
 public void postInitGraphicsAndLevel()
 {
     if (graphicsConfiguration != null)
     {
-//            System.out.println("level = " + level);
-//            System.out.println("levelScene .level = " + levelScene.level);
+//            //System.out.println("level = " + level);
+//            //System.out.println("levelScene .level = " + levelScene.level);
 //        level = marioEnvironment.getLevel();
 
         this.mario = marioEnvironment.getMario();
         this.mario.cheatKeys = cheatAgent.getAction();
-//            System.out.println("mario = " + mario);
+//            //System.out.println("mario = " + mario);
         this.level = marioEnvironment.getLevel();
         layer = new LevelRenderer(level, graphicsConfiguration, this.width, this.height);
         for (int i = 0; i < bgLayer.length; i++)
@@ -649,7 +649,7 @@ public void adjustFPS()
 {
     int fps = GlobalOptions.FPS;
     delay = (fps > 0) ? (fps >= GlobalOptions.MaxFPS) ? 0 : (1000 / fps) : 100;
-//        System.out.println("Delay: " + delay);
+//        //System.out.println("Delay: " + delay);
 }
 
 // THis method here solely for the displaying information in order to reduce
@@ -657,7 +657,7 @@ public void adjustFPS()
 
 public void setAgent(Agent agent)
 {
-//        System.out.println("agent = " + agent);
+//        //System.out.println("agent = " + agent);
     this.agentNameStr = agent.getName();
     if (agent instanceof KeyAdapter)
     {

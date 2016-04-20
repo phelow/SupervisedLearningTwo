@@ -87,6 +87,9 @@ private MarioState currentState;
 private Classifier m_classifier;
 String c_marioPerfectRunsDataPath = "";
 Instances isTrainingSet = null;
+Instance iExample;
+FastVector fvWekaAttributes;
+String[] tokens;
 public SupervisedLearningAgent(Instances trainingSet) throws Exception
 {
     super("SupervisedLearningAgent");
@@ -95,19 +98,37 @@ public SupervisedLearningAgent(Instances trainingSet) throws Exception
     m_classifier = (Classifier) new NaiveBayes();
     isTrainingSet.setClassIndex(12);
     m_classifier.buildClassifier(isTrainingSet);
-
-    Instance iUse = new Instance(16);
     
-    iUse.setDataset(isTrainingSet);
-    double[] fDistribution = m_classifier.distributionForInstance(iUse);
+    System.out.println(isTrainingSet.toSummaryString());
     
     currentState = new MarioState();
     
     SetUpWekaInterface();
     reset();
-}
-public void SetClassifier(Classifier c){
-	m_classifier = c;
+    
+  //TODO: fix
+	  //TODO: label is not added, not sure if it needs to be
+	  fvWekaAttributes = new FastVector(currentState.fields.size()+1);
+	  
+	  //Add all the numeric attributes
+	  for(int i = 0; i <currentState.fields.size(); i++){
+		  Attribute a = new Attribute("i" + currentState.fields.get(i).name);
+		  fvWekaAttributes.addElement( a);
+	  }
+
+	  FastVector fvClassVal = new FastVector(36);
+	  String nLabels = GenerateAllLabels(0,"");
+
+	  tokens = nLabels.split(",", -1);
+	  for(int i = 0; i < 64; i++){
+		  //System.out.println(tokens[i]);
+		  fvClassVal.addElement(tokens[i]);
+	  }
+	  
+		 
+	  Attribute ClassAttribute = new Attribute("MovementLabel",fvClassVal);
+	  
+	  fvWekaAttributes.addElement(ClassAttribute);
 }
 
 
@@ -195,7 +216,7 @@ public String GenerateAllLabels(int i, String s){
 
 public void integrateObservation(Environment environment) {
   // Update the current state.
-	System.out.println("integrateObservation2");
+	//System.out.println("integrateObservation2");
 
     levelScene = environment.getLevelSceneObservationZ(zLevelScene);
     enemies = environment.getEnemiesObservationZ(zLevelEnemies);
@@ -221,78 +242,38 @@ public void integrateObservation(Environment environment) {
     getKillsByStomp = marioState[8];
     getKillsByShell = marioState[9];
 	
-
-  
-  
-  boolean[] action = new boolean[numberOfOutputs];
   if(framesPassed > 3){
 	  currentState.update(environment);
 
-	  //TODO: add the data from the current frame to a insance, use that instance on the classifier to find the output
-	  /*
-	   * for(int i = 0; i <currentState.fields.size(); i++){
-	    		System.out.println(i + ":" + currentState.fields.size() );
-	    		writer.write(""+currentState.fields.get(i).getInt()); 
-	    			writer.write(",");
-	    	}
-	    	 
-	    	 for(int i = 0; i <6;i++){
-		    		writer.write(""+ mario.keys[i]); 
 
-		    		if(i != 5){
-		    			writer.write(",");
-		    		}
-	    	 }
-	   * 
-	   */
-	  
-	  //TODO: fix
-	  //TODO: label is not added, not sure if it needs to be
-	  FastVector fvWekaAttributes = new FastVector(currentState.fields.size()+1);
-	  
-	  Instance iExample = new SparseInstance(currentState.fields.size());
-	  //Add all the numeric attributes
+	  iExample = new DenseInstance(currentState.fields.size());
+	  System.out.println("");
 	  for(int i = 0; i <currentState.fields.size(); i++){
-		  Attribute a = new Attribute("i" + currentState.fields.get(i).name);
-		  fvWekaAttributes.addElement( a);
-	  }
-
-	  FastVector fvClassVal = new FastVector(36);
-	  String nLabels = GenerateAllLabels(0,"");
-
-	  String[] tokens = nLabels.split(",", -1);
-	  for(int i = 0; i < 64; i++){
-		  System.out.println(tokens[i]);
-		  fvClassVal.addElement(tokens[i]);
-	  }
-	  
-		 
-	  Attribute ClassAttribute = new Attribute("MovementLabel",fvClassVal);
-	  
-	  fvWekaAttributes.addElement(ClassAttribute);
-	  
-	  for(int i = 0; i <currentState.fields.size(); i++){
-		  
+		  System.out.print(currentState.fields.get(i).getInt());
 		  iExample.setValue((Attribute)fvWekaAttributes.elementAt(i), currentState.fields.get(i).getInt());
-		  System.out.println(iExample.toString());
+		  //System.out.println(iExample.toString());
 		  
 	  }
-	  iExample.setValue((Attribute)fvWekaAttributes.elementAt(currentState.fields.size()),"truetruetruetruetruetrue");
+	  System.out.println("");
+	  for(int i = 0; i <currentState.fields.size(); i++){
+		  System.out.print(iExample.toString(i));
+	  }
+	  System.out.println("");
 	  //TODO: I think we need to set all this up before we run the thing
-	  System.out.println("currentState.fields.size():" + currentState.fields.size());
-	  System.out.println("fvWekaAttributes.size():" + fvWekaAttributes.size());
-	  System.out.println("fvWekaAttributes.elementAt(i):" + fvWekaAttributes.elementAt(0).toString());
-	  System.out.println("currentState.fields.get(i).getInt():" + currentState.fields.get(0).getInt());
-	  System.out.println(iExample.toString());
+	  //System.out.println("currentState.fields.size():" + currentState.fields.size());
+	  //System.out.println("fvWekaAttributes.size():" + fvWekaAttributes.size());
+	  //System.out.println("fvWekaAttributes.elementAt(i):" + fvWekaAttributes.elementAt(0).toString());
+	  //System.out.println("currentState.fields.get(i).getInt():" + currentState.fields.get(0).getInt());
+	  //System.out.println(iExample.toString());
 	  
 	  
-	  isTrainingSet.add(iExample);
+	  //isTrainingSet.add(iExample);
 
 	  
 	  
 	  
 	  iExample.setDataset(isTrainingSet);
-	  System.out.println("Printing probability");
+	  //System.out.println("Printing probability");
 	  try{
 		  double[] fDistribution = m_classifier.distributionForInstance(iExample);
 		  int max = 0;
@@ -310,20 +291,20 @@ public void integrateObservation(Environment environment) {
 			  //get the moves from the token
 			  if(tokens[max].substring(start, start + 5).equals("false")){
 				  start += 5;
-				  System.out.println(false);
+				  //System.out.println(false);
 				  action[i] = false;
 			  }
 			  else if(tokens[max].substring(start,start+ 4).equals("true")){
 				  start += 4;
-				  System.out.println(true);
+				  //System.out.println(true);
 				  action[i] = true;
 			  }else{
-				  System.out.println("ERROR");
+				  //System.out.println("ERROR");
 			  }
 		 }
 		  
 	  } catch (Exception e){
-		  System.out.println("Could not print likelihoods");
+		  //System.out.println("Could not print likelihoods");
 	  }
 	  
 /*

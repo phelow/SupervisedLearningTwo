@@ -136,8 +136,8 @@ public final class Main
 		
 		Evaluation eval = new Evaluation(train);
 		eval.evaluateModel(scheme,test);
-		System.out.println(eval.toSummaryString("\n" + name + " (Train/Test) Results\n======\n",true));
-		System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+		//System.out.println(eval.toSummaryString("\n" + name + " (Train/Test) Results\n======\n",true));
+		//System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
 	}
 	
 	public static RandomForest RandomForestTree(Instances data) throws Exception{
@@ -146,8 +146,8 @@ public final class Main
 		if (use10foldcross) {
 			Evaluation eval = new Evaluation(data);
 			eval.crossValidateModel(rf, data, 10, new Random(1));
-			System.out.println(eval.toSummaryString("\nRandom Forest Results\n======\n",true));
-			System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
+			//System.out.println(eval.toSummaryString("\nRandom Forest Results\n======\n",true));
+			//System.out.println(eval.fMeasure(1) + " " + eval.precision(1) + " " + eval.recall(1));
 		}
 		else {
 			TrainTestSplit(data,rf,"Random Forest");
@@ -214,8 +214,8 @@ public final class Main
 		 // fDistribution[1] is the probability of being negative
 		 double[] fDistribution = cModel.distributionForInstance(iUse);
 		 
-		 System.out.println(fDistribution[0]);
-		 System.out.println(fDistribution[1]);
+		 //System.out.println(fDistribution[0]);
+		 //System.out.println(fDistribution[1]);
 		 
 	}
 
@@ -274,7 +274,6 @@ public final class Main
 				breader.close();
 				
 				
-		        agent.SetClassifier(DeserializeModel());
 	        } else if(recordingMode){
 		        agent2 = new MarioRLAgent();
 	        }
@@ -287,7 +286,7 @@ public final class Main
 	        	
 	    	    basicTask.setOptionsAndReset(marioAIOptions);
 	    	    if(i < 9000){
-	    	    	marioAIOptions.setVisualization(false);
+	    	    	//marioAIOptions.setVisualization(false);
 	    	    }
 	    	    else{
 
@@ -298,7 +297,7 @@ public final class Main
 	            do
 	            {
 	            	if(recordingMode){
-	            		marioAIOptions.setAgent(agent2);
+	            		//marioAIOptions.setAgent(agent2);
 	            		
 	            	}
 	            	else{
@@ -309,7 +308,7 @@ public final class Main
 	                marioAIOptions.setLevelRandSeed(seed++);
 	                basicTask.runSingleEpisode(1);
 	                basicTask.doEpisodes(1,true,1);
-	                System.out.println(basicTask.getEnvironment().getEvaluationInfoAsString());
+	                //System.out.println(basicTask.getEnvironment().getEvaluationInfoAsString());
 	            } while (basicTask.getEnvironment().getEvaluationInfo().marioStatus != Environment.MARIO_STATUS_WIN);
 	        }
 	//
